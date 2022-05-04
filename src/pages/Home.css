@@ -1,0 +1,3 @@
+ion-modal.ios::part(backdrop) {
+    opacity: 0.3;
+}

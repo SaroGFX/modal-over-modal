@@ -1,57 +1,85 @@
-import MessageListItem from '../components/MessageListItem';
-import { useState } from 'react';
-import { Message, getMessages } from '../data/messages';
+
+import { useRef, useState } from 'react';
 import {
   IonContent,
   IonHeader,
-  IonList,
+  IonButton,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
+  IonItem,
+  IonModal,
   IonTitle,
   IonToolbar,
   useIonViewWillEnter
 } from '@ionic/react';
 import './Home.css';
+import { Router } from 'workbox-routing';
 
-const Home: React.FC = () => {
 
-  const [messages, setMessages] = useState<Message[]>([]);
+interface HomePageProps {
+  router: HTMLIonRouterOutletElement | null;
+}
 
-  useIonViewWillEnter(() => {
-    const msgs = getMessages();
-    setMessages(msgs);
-  });
 
-  const refresh = (e: CustomEvent) => {
-    setTimeout(() => {
-      e.detail.complete();
-    }, 3000);
-  };
+const Home: React.FC<HomePageProps> = ({  }) => {
+  const pageRef = useRef(null);
+  const modalRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
+
+
+
 
   return (
-    <IonPage id="home-page">
+    <IonPage ref={pageRef} id="home-page">
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Inbox</IonTitle>
+          <IonTitle>Modal over modal</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonRefresher slot="fixed" onIonRefresh={refresh}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
+          <IonButton onClick={() => setShowModal(true)} expand='block' color='danger'>
+            Open Modal
+          </IonButton>
 
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">
-              Inbox
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
+          <IonModal 
+            ref={modalRef}
+            presentingElement={pageRef.current || undefined}
+            canDismiss={true}
+            showBackdrop={true}    
+            isOpen={showModal} 
+            onDidDismiss={() => setShowModal(false)}
+          >
 
-        <IonList>
-          {messages.map(m => <MessageListItem key={m.id} message={m} />)}
-        </IonList>
+            <IonToolbar color='primary'>
+                <IonButton onClick={() => setShowModal(false)}>Close Modal</IonButton>
+                <IonTitle>Modal 1</IonTitle>
+              </IonToolbar>
+            <IonContent>
+              
+              <IonButton onClick={() => setShowModal2(true)} expand='block' color='primary'>
+                Open Modal 2
+              </IonButton>
+
+            <IonModal
+              presentingElement={modalRef.current || undefined}
+              canDismiss={true}
+              isOpen={showModal2}
+              onDidDismiss={() => setShowModal2(false)}
+            >
+
+              <IonToolbar color='warning'>
+                <IonTitle>Modal 2</IonTitle>
+              </IonToolbar>
+              <IonContent>
+                Modal 2
+              </IonContent>
+          </IonModal>
+        
+
+
+            </IonContent>
+          </IonModal>
+        
       </IonContent>
     </IonPage>
   );
